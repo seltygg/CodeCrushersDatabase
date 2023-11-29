@@ -1,0 +1,8 @@
+{%extends 'DashboardTemplates/base.html' %}
+{% block content %}
+{% if graph %}
+{{ graph|safe }}
+{% else %}
+<p>No graph was provided.</p>
+{% endif %}
+{% endblock %}
