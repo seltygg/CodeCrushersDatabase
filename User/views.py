@@ -19,8 +19,6 @@ def loginView(request):
 
 def signupView(request):
     if request.method == "POST":
-        import pdb 
-        pdb.set_trace()
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)

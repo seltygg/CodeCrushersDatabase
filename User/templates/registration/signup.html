@@ -34,6 +34,8 @@
         {% endif %}
         <form method="post" action="{% url 'signup' %}">
             {% csrf_token %}
+            <p>Email:</p>
+            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
             {{form.as_p}}
             <!-- Add more fields as needed for your signup form -->
             <button type="submit">Sign Up</button>
