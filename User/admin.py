@@ -1,7 +1,13 @@
 from .models import *
 from django.contrib import admin
+
 admin.site.register(AccountAddresses)
-admin.site.register(Accounts)
+
+@admin.register(Accounts)
+class AccountsAdmin(admin.ModelAdmin):
+    list_display = ('accountid','pageid','accountemail','accountpassword','accountphonenum','accountdate','submodelid','last_login','accountlogofilepath')
+    ordering = ('accountid',)
+    search_fields = ('accountid','')
 admin.site.register(Advertisements)
 admin.site.register(Applications)
 admin.site.register(Article)
