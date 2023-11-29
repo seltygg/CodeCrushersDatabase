@@ -7,17 +7,4 @@
     {% else %}
       <p>No graph was provided.</p>
     {% endif %}
-  </div>
-  <div style="float: right; width: 18%; text-align: right; margin-right: 5%;">
-    <h2>Explanation of SQL Query</h2>
-    <ul>
-        <li>SQL query analyzes average messages per day by user types (Employers, Employees, JobSeekers).</li><br/>
-        <li>Utilizes a Common Table Expression (CTE) named "all_messages" for calculations.</li><br/>
-        <li>CTE calculates average messages per day for each user type.</li><br/>
-        <li>PIVOT function is applied to transform rows into columns for better readability.</li><br/>
-        <li>Resulting table shows average message counts for each user type on different days.</li><br/>
-        <li>Example: On Thursdays, Employers send 1.5 messages, Employees send 1.25, and JobSeekers send 1.</li><br/>
-        <li>Query aims to provide insights into messaging patterns of user types throughout the week.</li><br/>
-    </ul>
-  </div>
 {% endblock %}

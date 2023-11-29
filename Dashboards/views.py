@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
 from django.db import connection
+from django.contrib.auth.decorators import login_required
+@login_required
 def passingDashboardView(request):
+
     sql_query = """
     WITH QuizPassingScores AS (
         SELECT
@@ -40,13 +43,13 @@ def passingDashboardView(request):
     cursor.execute(sql_query)
     df = pd.read_sql_query(sql_query, connection)
     fig = px.bar(df, x='Certificate Name', y='PASSING_PERCENTAGE', text='PASSING_PERCENTAGE',
-                 labels={'PASSING_PERCENTAGE': 'Passing Percentage (%)'},
-                 title='Passing Percentage for Certificates')
+                labels={'PASSING_PERCENTAGE': 'Passing Percentage (%)'},
+                title='Passing Percentage for Certificates')
     fig.update_xaxes(tickangle=45, tickmode='array')
     graph = fig.to_html(full_html=False, default_height=600, default_width=1000)
     context = {'graph': graph}
     return render(request, 'DashboardTemplates/passingPercentageDashboard.html', context)
-
+@login_required
 def topVoiceDashboardView(request):
     sql_query = """
     WITH f_count AS (SELECT ac.accountid accID, COUNT(DISTINCT fl.followerpageid) follower_counts
@@ -85,7 +88,7 @@ def topVoiceDashboardView(request):
     graph = fig.to_html(full_html=False, default_height=600, default_width=800)
     context = {'graph': graph}
     return render(request, 'DashboardTemplates/passingPercentageDashboard.html', context)
-
+@login_required
 def topMessagesDashboardView(request):
     sql_query = """
     WITH all_messages AS (
@@ -109,13 +112,20 @@ def topMessagesDashboardView(request):
     """
     cursor = connection.cursor()
     cursor.execute(sql_query)
+    custom_order = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
     df = pd.read_sql_query(sql_query, connection)
+    df['DAYS'] = pd.Categorical(df['DAYS'], categories=custom_order, ordered=True)
+    df = df.sort_values('DAYS')
     fig = px.bar(df, x='DAYS', y=['EMPLOYER', 'EMPLOYEE', 'JOBSEEKER'],
              labels={'value': 'Average Messages', 'variable': 'User Type'},
              title='Average Messages by User Type and Day',
-             color='variable')
+             color='variable',barmode='group')
     fig.update_xaxes(tickangle=45, tickmode='array')
     graph = fig.to_html(full_html=False, default_height=600, default_width=1000)
     context = {'graph': graph}
     return render(request, 'DashboardTemplates/passingPercentageDashboard.html', context)
 
+
+def indexView(request):
+    return redirect('login')
+    return render(request, 'DashboardTemplates/passingPercentageDashboard.html', {})

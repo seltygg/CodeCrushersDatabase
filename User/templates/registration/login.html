@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static 'images/LinkedIn_icon_circle.png' %}" sizes="16x16">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="logo-container">
+        <a href="#">
+            <img src="{% static 'images/LinkedIn-Logo-2019.png' %}" class="linkedin-logo" alt="LinkedIn">
+        </a>
+
+        
+    </div>
+<h1 style="text-align: center; font-size: 20px">Stay updated on your professional world</h1>
+<div class="container">
+    
+    <h2 style="text-align: center; font-size: 20px; font-weight: bold;">Sign in</h2>
+    {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="message-{{ message.tags }}">
+                        {{ message }}
+                        <span class="close-button" onclick="this.parentElement.style.display='none';">&times;</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="switch">
+        <p>Don't have an account?<a href="{% url 'signup' %}">Sign up</a></p>
+    </div>
+</div>
+
+</body>
+</html>

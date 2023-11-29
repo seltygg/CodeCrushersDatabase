@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static 'images/LinkedIn_icon_circle.png' %}" sizes="16x16">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="logo-container">
+        <a href="https://www.linkedin.com">
+            <img src="{% static 'images/LinkedIn-Logo-2019.png' %}" class="linkedin-logo" alt="LinkedIn">
+        </a>
+
+        
+    </div>
+    <h1 style="text-align: center; font-size: 20px">Make the most of your professional life</h1>
+    <div class="container">
+        {% if form.errors %}
+            <p style="color: red">There was an error with your form</p>
+        {% endif %}
+        <h2 style="text-align: center; font-size: 20px; font-weight: bold;">Sign up</h2>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="message-{{ message.tags }}">
+                        {{ message }}
+                        <span class="close-button" onclick="this.parentElement.style.display='none';">&times;</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" action="{% url 'signup' %}">
+            {% csrf_token %}
+            {{form.as_p}}
+            <!-- Add more fields as needed for your signup form -->
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="switch">
+            <p >Don't have an account?<a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+    
+</body>
+<script>
+    function togglePassword(fieldId) {
+        var passwordField = document.getElementById(fieldId);
+        var fieldType = passwordField.getAttribute('type');
+        
+        if (fieldType === 'password') {
+            passwordField.setAttribute('type', 'text');
+        } else {
+            passwordField.setAttribute('type', 'password');
+        }
+    }
+</script>
+</html>
