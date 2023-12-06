@@ -21,8 +21,14 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" href="{% url 'topVoiceDashboard' %}">Top Voice Dashboard</a>
-                        <a class="dropdown-item" href="{% url 'topMessagesDashboard' %}">Message Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'averageMessagesPerUserType' %}">Message Dashboard</a>
                         <a class="dropdown-item" href="{% url 'passingDashboard' %}">Passing Percentage Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'mostPopularTeachersDashboard' %}">Most Popular Teachers Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'connectionsNetworkDashboard' %}">Connections Network Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'numberOfUsersPerCourse' %}">Number of Users Per Course Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'averageNumberOfMessagesByUser' %}">Average Number Of Users Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'topicsByPopularityDashboard' %}">Top Topics Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'minMaxSalaryByDepartmentDashboard' %}">Min Max Salary By Department</a>
                     </div>
                 </div>
             </div>

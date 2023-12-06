@@ -35,4 +35,9 @@ def signupView(request):
     return render(request, 'registration/signup.html',{
         'form': form,
     })
+
+def logoutView(request):
+    logout(request)
+    messages.success(request, 'Logout successful!')
+    return redirect('login')
 # Create your views here.

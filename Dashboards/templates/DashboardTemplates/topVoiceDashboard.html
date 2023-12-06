@@ -1,14 +1,8 @@
-{% extends 'DashboardTemplates/base.html' %}
-
+{%extends 'DashboardTemplates/base.html' %}
 {% block content %}
-  <div style="float: left; width: 70%;">
-    {% if graph %}
-      {{ graph|safe }}
-    {% else %}
-      <p>No graph was provided.</p>
-    {% endif %}
-  </div>
-  <div style="float: right; width: 30%; text-align: right;">
-    <p>This SQL query is designed to analyze the average number of messages sent per day by different user types, specifically Employers, Employees, and JobSeekers. The query utilizes a Common Table Expression (CTE) called all_messages to calculate the average number of messages sent by each user type on each day of the week. The data is then pivoted using the PIVOT function, transforming rows into columns for better readability. The resulting table displays the average message counts for each user type on different days of the week. For instance, it reveals that on Thursdays, Employers send an average of 1.5 messages, Employees send 1.25 messages, and JobSeekers send 1 message. The overall goal of this query is to provide insights into the messaging patterns of different user types over the course of the week, aiding in the understanding of communication dynamics within the system.</p>
-  </div>
+{% if graph %}
+{{ graph|safe }}
+{% else %}
+<p>No graph was provided.</p>
+{% endif %}
 {% endblock %}
