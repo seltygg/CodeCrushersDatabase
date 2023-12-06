@@ -3,11 +3,11 @@ from django.contrib import admin
 admin.site.site_url = '/passingDashboard'
 admin.site.register(AccountAddresses)
 
-@admin.register(Accounts)
-class AccountsAdmin(admin.ModelAdmin):
-    list_display = ('accountid','pageid','accountemail','accountphonenum','accountdate','subscriptiontype')
-    ordering = ('accountid',)
-    search_fields = ('accountid','')
+# @admin.register(Accounts)
+# class AccountsAdmin(admin.ModelAdmin):
+#     list_display = ('accountid','pageid','accountemail','accountphonenum','accountdate','subscriptiontype')
+#     ordering = ('accountid',)
+#     search_fields = ('accountid','')
 admin.site.register(Advertisements)
 admin.site.register(Applications)
 admin.site.register(Article)
