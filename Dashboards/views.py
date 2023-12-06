@@ -497,6 +497,56 @@ def monthsWithNegativeSubscriptions(request):
     
     return render(request, 'DashboardTemplates/monthsWithNegativeSubscriptions.html', context)
 
+@login_required
+def monthlyActivityCountDashboard(request):
+    # Use triple-quoted strings for SQL queries for better readability
+    sql_query = """
+    WITH AllActivities AS (
+        SELECT 'Post' AS ActivityType, POSTID, POSTTIMESTAMP AS ActivityTimestamp FROM Posts 
+        UNION ALL
+        SELECT 'Comment' AS ActivityType, POSTID, COMMENTTIMESTAMP AS ActivityTimestamp FROM Post_comments
+        UNION ALL
+        SELECT 'Like' AS ActivityType, POSTID, LIKETIMESTAMP AS ActivityTimestamp FROM Post_likes 
+    )
+    SELECT 
+        TO_CHAR(ActivityTimestamp, 'YYYY-MM-DD HH24:MI:SS') AS ActivityDateTime, 
+        ActivityType, 
+        COUNT(*) AS ActivityCount 
+    FROM 
+        AllActivities 
+    GROUP BY 
+        TO_CHAR(ActivityTimestamp, 'YYYY-MM-DD HH24:MI:SS'), 
+        ActivityType 
+    ORDER BY 
+        ActivityCount DESC, ActivityDateTime 
+    """
+
+    # Use try-except block for better error handling
+    try:
+        cursor = connection.cursor()
+        cursor.execute(sql_query)
+        df = pd.read_sql_query(sql_query, connection)
+
+        # Create a bar chart using Plotly
+        df['ACTIVITYDATETIME'] = pd.to_datetime(df['ACTIVITYDATETIME'])
+
+        fig = px.scatter(df, x='ACTIVITYDATETIME', y='ACTIVITYCOUNT', color='ACTIVITYTYPE', title='Activity Count Over Time',
+                        labels={'ACTIVITYCOUNT': 'Activity Count', 'ACTIVITYDATETIME': 'Activity DateTime'})
+
+        # Convert the Plotly figure to HTML
+        chart_html = fig.to_html(full_html=False)
+
+        # Pass the HTML and DataFrame to the template
+        context = {'graph': chart_html, 'df': df, 'sql_query': sql_query}
+
+        # Render the template with the context
+        return render(request, 'DashboardTemplates/monthlyActivityCountDashboard.html', context)
+
+    except Exception as e:
+        # Handle exceptions and return an error page or message
+        error_message = f"An error occurred: {str(e)}"
+        return render(request, 'error_template.html', {'error_message': error_message})
+
 
 def indexView(request):
     return redirect('login')

@@ -14,4 +14,5 @@ urlpatterns = [
     path('minMaxSalaryByDepartmentDashboard', views.minMaxSalaryByDepartmentDashboard, name='minMaxSalaryByDepartmentDashboard'),
     path('numberOfDiverseJobApplicationsDashboard', views.numberOfDiverseJobApplicationsDashboard, name='numberOfDiverseJobApplicationsDashboard'),
     path('monthsWithNegativeSubscriptions', views.monthsWithNegativeSubscriptions, name='monthsWithNegativeSubscriptions'),
+    path('monthlyActivityCountDashboard', views.monthlyActivityCountDashboard, name='monthlyActivityCountDashboard'),
 ]
