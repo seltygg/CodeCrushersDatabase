@@ -1,37 +1,42 @@
 {% extends 'DashboardTemplates/base.html' %}
 
 {% block content %}
-  <div class="container">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-md-6">
         {% if graph %}
-          {{ graph|safe }}
+          <div class="embed-responsive embed-responsive-16by9">
+            {{ graph|safe }}
+          </div>
         {% else %}
           <p>No graph was provided.</p>
         {% endif %}
+        
+        <h2>SQL Query</h2>
+        <pre><code>{{ sql_query }}</code></pre>
       </div>
       <div class="col-md-6">
         <h2>Data Table</h2>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>User Name</th>
-              <th>1st Friends</th>
-              <th>Mutual Friends</th>
-              <th>Mutuals FAccID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for index, row in df.iterrows %}
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
               <tr>
-                <td>{{ row.USER_NAME }}</td>
-                <td>{{ row.1stFriends }}</td>
-                <td>{{ row.MutualFriends }}</td>
-                <td>{{ row.MutualsFAccID }}</td>
+                {% for column in df.columns %}
+                  <th>{{ column }}</th>
+                {% endfor %}
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for index, row in df.iterrows %}
+                <tr>
+                  {% for value in row %}
+                    <td>{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

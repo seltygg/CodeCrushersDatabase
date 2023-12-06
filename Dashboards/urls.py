@@ -12,4 +12,6 @@ urlpatterns = [
     path('averageNumberOfMessagesByUser', views.averageNumberOfMessagesByUser, name='averageNumberOfMessagesByUser'),
     path('topicsByPopularityDashboard', views.topicsByPopularityDashboard, name='topicsByPopularityDashboard'),
     path('minMaxSalaryByDepartmentDashboard', views.minMaxSalaryByDepartmentDashboard, name='minMaxSalaryByDepartmentDashboard'),
+    path('numberOfDiverseJobApplicationsDashboard', views.numberOfDiverseJobApplicationsDashboard, name='numberOfDiverseJobApplicationsDashboard'),
+    path('monthsWithNegativeSubscriptions', views.monthsWithNegativeSubscriptions, name='monthsWithNegativeSubscriptions'),
 ]

@@ -1,8 +1,43 @@
-{%extends 'DashboardTemplates/base.html' %}
+{% extends 'DashboardTemplates/base.html' %}
+
 {% block content %}
-{% if graph %}
-{{ graph|safe }}
-{% else %}
-<p>No graph was provided.</p>
-{% endif %}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-6">
+        {% if graph %}
+          <div class="embed-responsive embed-responsive-16by9">
+            {{ graph|safe }}
+          </div>
+        {% else %}
+          <p>No graph was provided.</p>
+        {% endif %}
+        
+        <h2>SQL Query</h2>
+        <pre><code>{{ sql_query }}</code></pre>
+      </div>
+      <div class="col-md-6">
+        <h2>Data Table</h2>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                {% for column in df.columns %}
+                  <th>{{ column }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for index, row in df.iterrows %}
+                <tr>
+                  {% for value in row %}
+                    <td>{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

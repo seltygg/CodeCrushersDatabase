@@ -48,8 +48,8 @@ def passingDashboardView(request):
                 labels={'PASSING_PERCENTAGE': 'Passing Percentage (%)'},
                 title='Passing Percentage for Certificates')
     fig.update_xaxes(tickangle=45, tickmode='array')
-    graph = fig.to_html(full_html=False, default_height=600, default_width=1000)
-    context = {'graph': graph}
+    graph = fig.to_html(full_html=False)
+    context = {'graph': graph, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/passingPercentageDashboard.html', context)
 
 @login_required
@@ -90,30 +90,33 @@ def topVoiceDashboardView(request):
                  title='Top Voice Metrics by Owner',
                  size_max=60)
     fig.update_xaxes(tickangle=45, tickmode='array')
-    graph = fig.to_html(full_html=False, default_height=600, default_width=800)
-    context = {'graph': graph}
+    graph = fig.to_html(full_html=False)
+    context = {'graph': graph, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/topVoiceDashboard.html', context)
 
 @login_required
 def averageMessagesPerUserType(request):
     sql_query = """
-    WITH all_messages AS (
-    SELECT
-        IU.usertype,
-        ROUND(COUNT(M.messageID)/(COUNT (DISTINCT M.mSenderID)),2) msgAvg,
-        to_char(msgtimestamp, 'DY') Days
-    FROM
-        messages M
-        JOIN individual_users IU ON M.mSenderID = IU.userAccountID
-    GROUP BY
-        to_char(msgtimestamp, 'DY'),IU.usertype
-    )
-    SELECT
-        *
-    FROM
-        all_messages
-    PIVOT (
-        sum(msgAvg) FOR usertype IN ('Employer' AS Employer, 'Employee' AS Employee, 'JobSeeker' AS JobSeeker)
+    WITH find_type AS (SELECT useraccountid, (CASE WHEN useraccountid IN (SELECT employerid FROM employers) THEN 'EMPLOYER'
+    WHEN useraccountid IN (SELECT employeeid FROM employees) THEN 'EMPLOYEE'
+    WHEN useraccountid IN (SELECT jobseekerid FROM job_seekers) THEN 'JOB SEEKER'
+    END) usertype
+    FROM individual_users iu),
+
+    all_messages AS ( SELECT usertype,
+    ROUND(COUNT(msg.messageID)/(COUNT (DISTINCT msg.mSenderID)),2) Avg_msg,
+    TO_CHAR(msgtimestamp, 'DY') Days
+    FROM messages msg
+    JOIN find_type iu 
+    ON msg.mSenderID = iu.userAccountID
+    GROUP BY  (TO_CHAR(msgtimestamp, 'DY')), usertype)
+
+    SELECT *
+    FROM all_messages
+
+    PIVOT 
+    (
+    SUM(Avg_msg) FOR usertype IN ('EMPLOYER' AS Employers, 'EMPLOYEE' AS Employees, 'JOB SEEKER' AS JobSeekers)
     )
     """
     cursor = connection.cursor()
@@ -122,13 +125,13 @@ def averageMessagesPerUserType(request):
     df = pd.read_sql_query(sql_query, connection)
     df['DAYS'] = pd.Categorical(df['DAYS'], categories=custom_order, ordered=True)
     df = df.sort_values('DAYS')
-    fig = px.bar(df, x='DAYS', y=['EMPLOYER', 'EMPLOYEE', 'JOBSEEKER'],
+    fig = px.bar(df, x='DAYS', y=['EMPLOYERS', 'EMPLOYEES', 'JOBSEEKERS'],
              labels={'value': 'Average Messages', 'variable': 'User Type'},
              title='Average Messages by User Type and Day',
              color='variable',barmode='group')
     fig.update_xaxes(tickangle=45, tickmode='array')
-    graph = fig.to_html(full_html=False, default_height=600, default_width=1000)
-    context = {'graph': graph}
+    graph = fig.to_html(full_html=False)
+    context = {'graph': graph, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/averageMessagesPerUserType.html', context)
 
 
@@ -173,7 +176,7 @@ def mostPopularTeachersDashboard(request):
     # Convert the Plotly figure to HTML
     chart_html = fig.to_html(full_html=False)
 
-    context = {'graph': chart_html}
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/mostPopularTeachersDashboard.html', context)
 
 @login_required
@@ -281,7 +284,7 @@ def connectionsNetworkDashboard(request):
     connection.close()
 
     # Pass the HTML and other context variables to the template
-    context = {'graph': chart_html, 'df': df}
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/connectionsNetworkDashBoard.html', context)
 
 def numberOfUsersPerCourse(request):
@@ -312,7 +315,7 @@ def numberOfUsersPerCourse(request):
     # Convert the Plotly figure to HTML
     chart_html = fig.to_html(full_html=False)
 
-    context = {'graph': chart_html}
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/numberOfUsersPerCourse.html', context)
 
 @login_required
@@ -345,7 +348,7 @@ def averageNumberOfMessagesByUser(request):
 
     fig.update_layout(paper_bgcolor = "lavender", font = {'color': "darkblue", 'family': "Arial"})
     chart_html = fig.to_html(full_html=False)
-    context = {'graph': chart_html}
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/numberOfUsersPerCourse.html', context)
 
 @login_required
@@ -387,7 +390,7 @@ def topicsByPopularityDashboard(request):
         yaxis_title="Popularity Score",
     )
     chart_html = fig.to_html(full_html=False)
-    context = {'graph': chart_html}
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
     return render(request, 'DashboardTemplates/bottomTopicsDashboard.html', context)
 
 @login_required
@@ -419,9 +422,81 @@ def minMaxSalaryByDepartmentDashboard(request):
     fig.update_layout(barmode='group')
     
     chart_html = fig.to_html(full_html=False)
-    context = {'graph': chart_html}
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
     
     return render(request, 'DashboardTemplates/minMaxSalaryByDepartmentDashboard.html', context)
+
+@login_required
+def numberOfDiverseJobApplicationsDashboard(request):
+    sql_query = """
+    SELECT
+        ius.fName || ius.lName NAME,
+        COUNT(a.jobid) "No. of Applications",
+        COUNT(DISTINCT jobcategory) "Diversity In Job Category",
+        COUNT(DISTINCT jobtitle) "Diversity In Job Positions"
+    FROM individual_users ius
+    JOIN job_seekers js 
+        ON ius.useraccountid = js.jobseekerid
+    JOIN applies a 
+        ON js.jobseekerid = a.jobseekerid
+    JOIN jobs j 
+        ON j.jobid = a.jobid
+    GROUP BY ius.fName || ius.lName
+    HAVING COUNT(a.jobid) > 3
+    ORDER BY "No. of Applications" DESC
+    FETCH FIRST 5 ROWS WITH TIES
+    """
+    cursor = connection.cursor()
+    cursor.execute(sql_query)
+    df = pd.read_sql_query(sql_query, connection)
+    
+    fig = px.bar(df, x='NAME', y=['No. of Applications', 'Diversity In Job Category', 'Diversity In Job Positions'],
+                 title='Number of Diverse Job Applications by Individual',
+                 labels={'value': 'Count'},
+                 hover_name='NAME',
+                 color_discrete_map={'No. of Applications': 'blue', 'Diversity In Job Category': 'orange', 'Diversity In Job Positions': 'green'})
+
+    # Customize the layout if needed
+    fig.update_layout(barmode='group')
+    
+    chart_html = fig.to_html(full_html=False)
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
+    
+    return render(request, 'DashboardTemplates/numberOfDiverseJobApplicationsDashboard.html', context)
+
+@login_required
+def monthsWithNegativeSubscriptions(request):
+    sql_query = """
+    WITH subscrp AS (SELECT accountid, subscriptiontype,EXTRACT(MONTH FROM accountdate) monthly
+    FROM accounts),
+    final AS (SELECT * 
+    FROM subscrp
+    PIVOT
+    (COUNT (accountid)
+    FOR subscriptiontype IN ('premium' Premium))),
+    df AS (SELECT monthly,
+    premium - LAG(premium) OVER (ORDER BY monthly) AS monthly_diff
+    FROM final)
+    SELECT monthly months
+    FROM df 
+    WHERE monthly_diff < 0 and monthly is NOT NULL
+    """
+    cursor = connection.cursor()
+    cursor.execute(sql_query)
+    df = pd.read_sql_query(sql_query, connection)
+    
+    # Create a bar chart using Plotly
+    fig = px.bar(df, x='MONTHS', y=df['MONTHS'], labels={'MONTHS': 'Months'}, title='Months with Negative Subscriptions')
+
+    # Customize the chart if needed
+    fig.update_traces(marker_color='red')  # Set bar color to red for emphasis
+    fig.update_layout(yaxis_title='Number of Subscriptions', xaxis_title='Months', title_text='Months with Negative Subscriptions')
+    
+    chart_html = fig.to_html(full_html=False)
+    context = {'graph': chart_html, 'df': df,'sql_query':sql_query}
+    
+    return render(request, 'DashboardTemplates/monthsWithNegativeSubscriptions.html', context)
+
 
 def indexView(request):
     return redirect('login')
